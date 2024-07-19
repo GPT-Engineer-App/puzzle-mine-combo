@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { cn } from "@/lib/utils";
 
-const Tile = ({ letter, shake, hasMine }) => {
+const Tile = ({ letter, shake, hasMine, onClick }) => {
   const [isHovered, setIsHovered] = useState(false);
 
   const tileClasses = cn(
@@ -17,6 +17,7 @@ const Tile = ({ letter, shake, hasMine }) => {
       className={tileClasses}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={onClick}
     >
       {letter}
     </div>

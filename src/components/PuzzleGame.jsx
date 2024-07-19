@@ -4,6 +4,7 @@ import Tile from './Tile';
 const PuzzleGame = () => {
   const [grid, setGrid] = useState([]);
   const [mines, setMines] = useState([]);
+  const [score, setScore] = useState(0);
 
   useEffect(() => {
     initializeGame();
@@ -11,9 +12,13 @@ const PuzzleGame = () => {
 
   const initializeGame = () => {
     const letters = ['A', 'B', 'C'];
-    const newGrid = Array(3).fill().map(() => 
-      Array(3).fill().map(() => letters[Math.floor(Math.random() * 3)])
-    );
+    let newGrid;
+    do {
+      newGrid = Array(3).fill().map(() => 
+        Array(3).fill().map(() => letters[Math.floor(Math.random() * 3)])
+      );
+    } while (!isValidGrid(newGrid));
+    
     setGrid(newGrid);
 
     const newMines = [];
@@ -25,6 +30,19 @@ const PuzzleGame = () => {
       }
     }
     setMines(newMines);
+  };
+
+  const isValidGrid = (grid) => {
+    // Check rows
+    for (let row of grid) {
+      if (new Set(row).size !== 3) return false;
+    }
+    // Check columns
+    for (let col = 0; col < 3; col++) {
+      const column = grid.map(row => row[col]);
+      if (new Set(column).size !== 3) return false;
+    }
+    return true;
   };
 
   const hasMine = (row, col) => {
@@ -54,9 +72,16 @@ const PuzzleGame = () => {
     return hasMine(row, col);
   };
 
+  const handleTileClick = (row, col) => {
+    if (hasMine(row, col)) {
+      setScore(prevScore => prevScore + 1);
+    }
+  };
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
       <h1 className="text-3xl font-bold mb-6">Puzzle Game</h1>
+      <div className="mb-4 text-xl">Score: {score}</div>
       <div className="grid grid-cols-3 gap-2 bg-white p-4 rounded-lg shadow-md">
         {grid.map((row, i) => 
           row.map((letter, j) => (
@@ -65,6 +90,7 @@ const PuzzleGame = () => {
               letter={letter} 
               shake={shouldShake(letter, i, j)}
               hasMine={hasMine(i, j)}
+              onClick={() => handleTileClick(i, j)}
             />
           ))
         )}
